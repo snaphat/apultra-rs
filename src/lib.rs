@@ -24,7 +24,7 @@ pub type Stats = apultra_stats;
 /// `Result` containing compressed buffer on success or `CompressionError` on compression failure.
 ///
 pub fn compress(
-    input_data: &Vec<u8>,
+    input_data: &[u8],
     flags: u32,
     max_window_size: usize,
     dictionary_size: usize,
@@ -80,7 +80,7 @@ pub fn compress(
 /// `Result` containing decompressed buffer on success or `DecompressionError` on decompression failure.
 ///
 pub fn decompress(
-    input_data: &Vec<u8>,
+    input_data: &[u8],
     dictionary_size: usize,
     flags: u32,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -133,7 +133,7 @@ pub fn get_max_compressed_size(input_size: usize) -> usize {
 /// # Returns
 /// maximum decompressed size
 ///
-pub fn get_max_decompressed_size(input_data: &Vec<u8>, flags: u32) -> usize {
+pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize {
     unsafe { apultra_get_max_decompressed_size(input_data.as_ptr(), input_data.len(), flags) }
 }
 
