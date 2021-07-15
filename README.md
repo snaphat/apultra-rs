@@ -37,8 +37,8 @@ fn main() {
         flags,
         max_window_size,
         dictionary_size,
-        Some(Box::new(progress)), // Pass callback closure can also pass None.
-        Some(&mut stats),         // Pass stats structure can also pass None.
+        Some(Box::new(progress)), // Pass callback closure. None can also be passed.
+        Some(&mut stats),         // Pass stats structure. None can also be passed.
     );
 
     // Check.
