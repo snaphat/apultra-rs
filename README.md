@@ -18,14 +18,30 @@ path = "apultra-rs"
 
 Example Usage in main.rs:
 ```rust
-use apultra;
-
 fn main() {
     // Create some data.
-    let ddata0 = vec![1, 2, 3, 4, 5];
+    let ddata0 = vec![1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5];
+
+    // Create other example parameters.
+    let flags = 0;              // Must be zero.
+    let max_window_size = 1024;
+    let dictionary_size = 0;
+    let progress = |original_size: i64, compressed_size: i64| {
+        println!("Original size: {}, Compressed Size: {}", original_size, compressed_size);
+    };
+    let mut stats = apultra::Stats::default();
 
     // Compress data.
-    let cdata_res = apultra::compress(&ddata0, 0, 0, 0, None, None);
+    let cdata_res = apultra::compress(
+        &ddata0,
+        flags,
+        max_window_size,
+        dictionary_size,
+        Some(Box::new(progress)), // Pass callback closure can also pass None.
+        Some(&mut stats),         // Pass stats structure can also pass None.
+    );
+
+    // Check.
     let cdata0 = match cdata_res {
         | Err(err) => {
             println!("Error: {}", err);
@@ -35,7 +51,9 @@ fn main() {
     };
 
     // Decompress data.
-    let ddata_res = apultra::decompress(&cdata0, 0, 0);
+    let ddata_res = apultra::decompress(&cdata0, dictionary_size, flags);
+
+    // Check.
     let ddata1 = match ddata_res {
         | Err(err) => {
             println!("Error: {}", err);
