@@ -1,4 +1,4 @@
-#![feature(try_reserve)]
+//#![feature(try_reserve)] // Only supported in future Rust.
 use std::error::Error;
 
 use libffi::high::ClosureMut2;
@@ -41,8 +41,8 @@ pub fn compress(
 
     // Try to allocate memory for compressed data.
     let max_size = get_max_compressed_size(input_data.len());
-    let mut out_buffer: Vec<u8> = Vec::new();
-    out_buffer.try_reserve(max_size)?;
+    let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
+    //out_buffer.try_reserve(max_size)?; // Only supported in future Rust.
     out_buffer.resize(max_size, 0);
 
     // Compress data.
@@ -88,8 +88,8 @@ pub fn decompress(
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
-    let mut out_buffer: Vec<u8> = Vec::new();
-    out_buffer.try_reserve(max_size)?;
+    let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
+    //out_buffer.try_reserve(max_size)?; // Only supported in future Rust.
     out_buffer.resize(max_size, 0);
 
     // Decompress data.
@@ -172,6 +172,8 @@ fn test_decompress() {
     assert_eq!(decompressed, [0; 100]);
 }
 
+//: Test only works with vec::try_reserve() support.
+/*
 #[test]
 fn test_decompress_error() {
     let input_data: Vec<u8> = vec![0];
@@ -179,6 +181,7 @@ fn test_decompress_error() {
     let dictionary_size = 0;
     let _err = decompress(&input_data, dictionary_size, flags).unwrap_err();
 }
+*/
 
 #[test]
 fn test_get_max_compressed_size() {

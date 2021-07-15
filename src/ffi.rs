@@ -170,8 +170,6 @@ fn test_decompress_error() {
         apultra_decompress(&input[0], &_output[0], input.len(), _output.len(), 0, window_size)
     };
     assert_eq!(output_len, -1);
-    //output.resize(output_len as usize, 0);
-    //assert_eq!(output, b"1234567890");
 }
 
 #[test]
