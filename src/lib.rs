@@ -14,9 +14,9 @@ pub type Stats = apultra_stats;
 ///
 /// # Arguments
 /// * `input_data` pointer to input(source) data to compress
-/// * `flags` compression flags (set to 0)
 /// * `max_window_size` maximum window size to use (0 for default)
 /// * `dictionary_size` size of dictionary in front of input data (0 for none)
+/// * `flags` compression flags (set to 0)
 /// * `progress` progress function, called after compressing each block, or NULL for none
 /// * `stats` pointer to compression stats that are filled if this function is successful, or NULL
 ///
@@ -25,9 +25,9 @@ pub type Stats = apultra_stats;
 ///
 pub fn compress(
     input_data: &[u8],
-    flags: u32,
     max_window_size: usize,
     dictionary_size: usize,
+    flags: u32,
     mut maybe_progress: Option<Box<dyn FnMut(i64, i64)>>,
     stats: Option<&mut Stats>,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -140,18 +140,18 @@ pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize {
 #[test]
 fn test_compress() {
     let input_data = vec![0; 100];
-    let flags = 0;
     let max_window_size = 0;
     let dictionary_size = 0;
+    let flags = 0;
     let progress = |a, b| {
         println!("{} {}", a, b);
     };
     let mut stats = apultra_stats::default();
     let compressed = compress(
         &input_data,
-        flags,
         max_window_size,
         dictionary_size,
+        flags,
         Some(Box::new(progress)),
         Some(&mut stats),
     )
@@ -163,8 +163,8 @@ fn test_compress() {
 #[test]
 fn test_decompress() {
     let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
-    let flags = 0;
     let dictionary_size = 0;
+    let flags = 0;
     let decompressed = decompress(&input_data, dictionary_size, flags).unwrap();
     assert_eq!(decompressed.len(), 100);
     assert_eq!(decompressed, [0; 100]);
