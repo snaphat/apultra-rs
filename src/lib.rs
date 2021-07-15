@@ -21,8 +21,7 @@ pub type Stats = apultra_stats;
 /// * `stats` pointer to compression stats that are filled if this function is successful, or NULL
 ///
 /// # Returns
-/// `Result` containing compressed buffer on success. `TryReserveError` on allocation failure,
-/// or `CompressionError` on compression failure.
+/// `Result` containing compressed buffer on success or `CompressionError` on compression failure.
 ///
 pub fn compress(
     input_data: &Vec<u8>,
@@ -78,8 +77,7 @@ pub fn compress(
 /// * `flags` compression flags (set to 0)
 ///
 /// # Returns
-/// `Result` containing decompressed buffer on success. `TryReserveError` on allocation failure,
-/// or `DecompressionError` on decompression failure.
+/// `Result` containing decompressed buffer on success or `DecompressionError` on decompression failure.
 ///
 pub fn decompress(
     input_data: &Vec<u8>,
