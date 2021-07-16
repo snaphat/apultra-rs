@@ -23,9 +23,9 @@ fn main() {
     let ddata0 = vec![1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5];
 
     // Create other example parameters.
-    let flags = 0;              // Must be zero.
     let max_window_size = 1024;
     let dictionary_size = 0;
+    let flags = 0; // Must be zero.
     let progress = |original_size: i64, compressed_size: i64| {
         println!("Original size: {}, Compressed Size: {}", original_size, compressed_size);
     };
@@ -34,9 +34,9 @@ fn main() {
     // Compress data.
     let cdata_res = apultra::compress(
         &ddata0,
-        flags,
         max_window_size,
         dictionary_size,
+        flags,
         Some(Box::new(progress)), // Pass callback closure. None can also be passed.
         Some(&mut stats),         // Pass stats structure. None can also be passed.
     );
