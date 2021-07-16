@@ -9,6 +9,8 @@ mod ffi;
 use crate::ffi::*;
 
 pub type Stats = apultra_stats;
+pub type CompressionError = error::CompressionError;
+pub type DecompressionError = error::DecompressionError;
 
 ///Compress memory
 ///

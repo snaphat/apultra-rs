@@ -33,14 +33,8 @@ fn test_compress_decompress2() {
     let max_window_size = 32;
     let dictionary_size = 0;
     let flags = 0;
-    let compressed = apultra::compress(
-        &input_data,
-        max_window_size,
-        dictionary_size,
-        flags,
-        None,
-        None,
-    );
+    let compressed =
+        apultra::compress(&input_data, max_window_size, dictionary_size, flags, None, None);
 
     let decompressed = apultra::decompress(&compressed.unwrap(), dictionary_size, flags).unwrap();
     assert_eq!(input_data, decompressed);
