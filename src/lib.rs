@@ -31,7 +31,7 @@ pub fn compress(
     flags: u32,
     mut maybe_progress: Option<Box<dyn FnMut(i64, i64)>>,
     stats: Option<&mut Stats>,
-) -> Result<Vec<u8>, Box<dyn Error>> {
+) -> Result<Vec<u8>, impl Error> {
     let progress = match &mut maybe_progress {
         | Some(progress) => Some(ClosureMut2::new(progress)),
         | _ => None,
@@ -62,7 +62,7 @@ pub fn compress(
 
     // Check for errors.
     match size {
-        | -1 => Err(Box::new(CompressionError)),
+        | -1 => Err(CompressionError),
         | _ => {
             out_buffer.resize(size as usize, 0);
             Ok(out_buffer)
@@ -84,7 +84,7 @@ pub fn decompress(
     input_data: &[u8],
     dictionary_size: usize,
     flags: u32,
-) -> Result<Vec<u8>, Box<dyn Error>> {
+) -> Result<Vec<u8>, impl Error> {
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
     let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
@@ -105,7 +105,7 @@ pub fn decompress(
 
     // Check for errors.
     match size {
-        | -1 => Err(Box::new(DecompressionError)),
+        | -1 => Err(DecompressionError),
         | _ => {
             out_buffer.resize(size as usize, 0);
             Ok(out_buffer)

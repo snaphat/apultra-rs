@@ -1,3 +1,5 @@
+use std::fmt;
+
 use apultra;
 
 #[test]
@@ -44,6 +46,15 @@ fn test_compress_decompress2() {
 fn test_compression_error() {
     let e: Result<bool, apultra::CompressionError> = Err(apultra::CompressionError);
     assert!(e.is_err());
+
+    let func = || -> Result<bool, apultra::CompressionError> { Err(apultra::CompressionError)? };
+
+    match func() {
+        | Err(e) => {
+            println!("{}", e);
+        }
+        | Ok(_) => (),
+    }
 }
 
 #[test]
@@ -52,8 +63,11 @@ fn test_decompression_error() {
     assert!(e.is_err());
     let func =
         || -> Result<bool, apultra::DecompressionError> { Err(apultra::DecompressionError)? };
-    let _e = func();
-    let func =
-        || -> Result<bool, apultra::DecompressionError> { Err(apultra::DecompressionError)? };
-    let _e = func();
+
+    match func() {
+        | Err(e) => {
+            println!("{}", e);
+        }
+        | Ok(_) => (),
+    }
 }
