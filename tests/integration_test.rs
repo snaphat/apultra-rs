@@ -50,4 +50,8 @@ fn test_compression_error() {
 fn test_decompression_error() {
     let e: Result<bool, apultra::DecompressionError> = Err(apultra::DecompressionError);
     assert!(e.is_err());
+    let func = || -> Result<bool, apultra::DecompressionError> { Err(apultra::DecompressionError)? };
+    let _e = func();
+    let func = || -> Result<bool> { Err(apultra::DecompressionError)? };
+    let _e = func();
 }
