@@ -4,13 +4,12 @@ use std::error::Error;
 use libffi::high::ClosureMut2;
 
 mod error;
-use crate::error::*;
 mod ffi;
 use crate::ffi::*;
 
 pub type Stats = apultra_stats;
-pub type CompressionError = error::CompressionError;
-pub type DecompressionError = error::DecompressionError;
+pub use error::CompressionError;
+pub use error::DecompressionError;
 
 ///Compress memory
 ///

@@ -39,3 +39,15 @@ fn test_compress_decompress2() {
     let decompressed = apultra::decompress(&compressed.unwrap(), dictionary_size, flags).unwrap();
     assert_eq!(input_data, decompressed);
 }
+
+#[test]
+fn test_compression_error() {
+    let e: Result<bool, apultra::CompressionError> = Err(apultra::CompressionError);
+    assert!(e.is_err());
+}
+
+#[test]
+fn test_decompression_error() {
+    let e: Result<bool, apultra::DecompressionError> = Err(apultra::DecompressionError);
+    assert!(e.is_err());
+}
