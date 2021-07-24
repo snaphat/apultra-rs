@@ -5,9 +5,9 @@ use self::thiserror::Error;
 pub enum ApultraError
 {
     // Normal Errors:
-    #[error("compression error: Internal API returned -1")]
+    #[error("Compression error: Internal API returned -1")]
     CompressionError(),
-    #[error("decompression error: Internal API returned -1")]
+    #[error("Decompression error: Internal API returned -1")]
     DecompressionError(),
 }
 
@@ -19,7 +19,7 @@ fn test_compression_error()
 
     let func = || -> Result<bool, ApultraError> { Err(ApultraError::CompressionError())? };
 
-    assert_eq!("compression error: Internal API returned -1", format!("{}", func().unwrap_err()));
+    assert_eq!("Compression error: Internal API returned -1", format!("{}", func().unwrap_err()));
 }
 
 #[test]
@@ -29,5 +29,5 @@ fn test_decompression_error()
     assert!(e.is_err());
     let func = || -> Result<bool, ApultraError> { Err(ApultraError::DecompressionError())? };
 
-    assert_eq!("decompression error: Internal API returned -1", format!("{}", func().unwrap_err()));
+    assert_eq!("Decompression error: Internal API returned -1", format!("{}", func().unwrap_err()));
 }
