@@ -1,9 +1,8 @@
-use std::fmt;
-
 use apultra;
 
 #[test]
-fn test_compress_decompress() {
+fn test_compress_decompress()
+{
     let input_data = vec![2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
     let max_window_size = 32;
@@ -29,7 +28,8 @@ fn test_compress_decompress() {
 }
 
 #[test]
-fn test_compress_decompress2() {
+fn test_compress_decompress2()
+{
     let input_data = vec![2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
     let max_window_size = 32;
@@ -43,31 +43,36 @@ fn test_compress_decompress2() {
 }
 
 #[test]
-fn test_compression_error() {
-    let e: Result<bool, apultra::CompressionError> = Err(apultra::CompressionError);
+fn test_compression_error()
+{
+    let e: Result<bool, apultra::Error> = Err(apultra::CompressionError());
     assert!(e.is_err());
 
-    let func = || -> Result<bool, apultra::CompressionError> { Err(apultra::CompressionError)? };
+    let func = || -> Result<bool, apultra::Error> { Err(apultra::CompressionError())? };
 
-    match func() {
-        | Err(e) => {
+    match func()
+    {
+        | Err(e) =>
+        {
             println!("{}", e);
-        }
+        },
         | Ok(_) => (),
     }
 }
 
 #[test]
-fn test_decompression_error() {
-    let e: Result<bool, apultra::DecompressionError> = Err(apultra::DecompressionError);
+fn test_decompression_error()
+{
+    let e: Result<bool, apultra::Error> = Err(apultra::DecompressionError());
     assert!(e.is_err());
-    let func =
-        || -> Result<bool, apultra::DecompressionError> { Err(apultra::DecompressionError)? };
+    let func = || -> Result<bool, apultra::Error> { Err(apultra::DecompressionError())? };
 
-    match func() {
-        | Err(e) => {
+    match func()
+    {
+        | Err(e) =>
+        {
             println!("{}", e);
-        }
+        },
         | Ok(_) => (),
     }
 }

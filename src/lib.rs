@@ -1,15 +1,16 @@
 //#![feature(try_reserve)] // Only supported in future Rust.
-use std::error::Error;
 
 use libffi::high::ClosureMut2;
 
 mod error;
 mod ffi;
+use error::ApultraError;
+
 use crate::ffi::*;
 
 pub type Stats = apultra_stats;
-pub use error::CompressionError;
-pub use error::DecompressionError;
+pub type Error = ApultraError;
+pub use error::ApultraError::{CompressionError, DecompressionError};
 
 ///Compress memory
 ///
@@ -22,8 +23,7 @@ pub use error::DecompressionError;
 /// * `stats` pointer to compression stats that are filled if this function is successful, or NULL
 ///
 /// # Returns
-/// `Result` containing compressed buffer on success or `CompressionError` on compression failure.
-///
+/// `Result` containing compressed buffer on success or `apultra::Error` on compression failure.
 pub fn compress(
     input_data: &[u8],
     max_window_size: usize,
@@ -31,8 +31,10 @@ pub fn compress(
     flags: u32,
     mut maybe_progress: Option<Box<dyn FnMut(i64, i64)>>,
     stats: Option<&mut Stats>,
-) -> Result<Vec<u8>, impl Error> {
-    let progress = match &mut maybe_progress {
+) -> Result<Vec<u8>, ApultraError>
+{
+    let progress = match &mut maybe_progress
+    {
         | Some(progress) => Some(ClosureMut2::new(progress)),
         | _ => None,
     };
@@ -61,12 +63,14 @@ pub fn compress(
     };
 
     // Check for errors.
-    match size {
-        | -1 => Err(CompressionError),
-        | _ => {
+    match size
+    {
+        | -1 => Err(CompressionError()),
+        | _ =>
+        {
             out_buffer.resize(size as usize, 0);
             Ok(out_buffer)
-        }
+        },
     }
 }
 
@@ -78,13 +82,13 @@ pub fn compress(
 /// * `flags` compression flags (set to 0)
 ///
 /// # Returns
-/// `Result` containing decompressed buffer on success or `DecompressionError` on decompression failure.
-///
+/// `Result` containing decompressed buffer on success or `apultra::Error` on decompression failure.
 pub fn decompress(
     input_data: &[u8],
     dictionary_size: usize,
     flags: u32,
-) -> Result<Vec<u8>, impl Error> {
+) -> Result<Vec<u8>, ApultraError>
+{
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
     let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
@@ -104,12 +108,14 @@ pub fn decompress(
     };
 
     // Check for errors.
-    match size {
-        | -1 => Err(DecompressionError),
-        | _ => {
+    match size
+    {
+        | -1 => Err(DecompressionError()),
+        | _ =>
+        {
             out_buffer.resize(size as usize, 0);
             Ok(out_buffer)
-        }
+        },
     }
 }
 
@@ -120,8 +126,8 @@ pub fn decompress(
 ///
 /// # Returns
 /// maximum compressed size
-///
-pub fn get_max_compressed_size(input_size: usize) -> usize {
+pub fn get_max_compressed_size(input_size: usize) -> usize
+{
     unsafe { apultra_get_max_compressed_size(input_size) }
 }
 
@@ -133,13 +139,14 @@ pub fn get_max_compressed_size(input_size: usize) -> usize {
 ///
 /// # Returns
 /// maximum decompressed size
-///
-pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize {
+pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize
+{
     unsafe { apultra_get_max_decompressed_size(input_data.as_ptr(), input_data.len(), flags) }
 }
 
 #[test]
-fn test_compress() {
+fn test_compress()
+{
     let input_data = vec![0; 100];
     let max_window_size = 0;
     let dictionary_size = 0;
@@ -162,7 +169,8 @@ fn test_compress() {
 }
 
 #[test]
-fn test_decompress() {
+fn test_decompress()
+{
     let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
     let dictionary_size = 0;
     let flags = 0;
@@ -183,12 +191,14 @@ fn test_decompress_error() {
 */
 
 #[test]
-fn test_get_max_compressed_size() {
+fn test_get_max_compressed_size()
+{
     assert_eq!(get_max_compressed_size(100), 114);
 }
 
 #[test]
-fn test_get_max_decompressed_size() {
+fn test_get_max_decompressed_size()
+{
     let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
     assert_eq!(get_max_decompressed_size(&input_data, 0), 100);
 }

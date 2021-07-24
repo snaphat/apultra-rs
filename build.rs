@@ -5,14 +5,16 @@ use std::{
     io::{Read, Write},
 };
 
-fn read_file<S: AsRef<str>>(path: S) -> String {
+fn read_file<S: AsRef<str>>(path: S) -> String
+{
     let mut file = File::open(path.as_ref()).expect("Unable to open file");
     let mut data = Vec::new();
     file.read_to_end(&mut data).expect("Unable to read file");
     String::from_utf8_lossy(&data).chars().collect()
 }
 
-fn write_file<S: AsRef<str>>(path: S, data: String) {
+fn write_file<S: AsRef<str>>(path: S, data: String)
+{
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -23,7 +25,8 @@ fn write_file<S: AsRef<str>>(path: S, data: String) {
     file.write(data.as_bytes()).expect("Unable to write file");
 }
 
-fn main() {
+fn main()
+{
     let dir = "apultra/src";
     let apultra_c = dir.to_owned() + "/apultra.c";
     let apultra_mod_c =

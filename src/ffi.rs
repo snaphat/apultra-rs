@@ -1,63 +1,60 @@
 extern crate cty;
 #[repr(C)]
-pub struct apultra_stats {
-    pub num_literals: cty::c_int,
-    pub num_4bit_matches: cty::c_int,
-    pub num_7bit_matches: cty::c_int,
+pub struct apultra_stats
+{
+    pub num_literals:         cty::c_int,
+    pub num_4bit_matches:     cty::c_int,
+    pub num_7bit_matches:     cty::c_int,
     pub num_variable_matches: cty::c_int,
-    pub num_rep_matches: cty::c_int,
-    pub num_eod: cty::c_int,
-
-    pub safe_dist: cty::c_int,
-
-    pub min_offset: cty::c_int,
-    pub max_offset: cty::c_int,
-    pub total_offsets: cty::c_longlong,
-
-    pub min_match_len: cty::c_int,
-    pub max_match_len: cty::c_int,
-    pub total_match_lens: cty::c_int,
-
-    pub min_rle1_len: cty::c_int,
-    pub max_rle1_len: cty::c_int,
-    pub total_rle1_lens: cty::c_int,
-
-    pub min_rle2_len: cty::c_int,
-    pub max_rle2_len: cty::c_int,
-    pub total_rle2_lens: cty::c_int,
-
-    pub commands_divisor: cty::c_int,
-    pub match_divisor: cty::c_int,
-    pub rle1_divisor: cty::c_int,
-    pub rle2_divisor: cty::c_int,
+    pub num_rep_matches:      cty::c_int,
+    pub num_eod:              cty::c_int,
+    pub safe_dist:            cty::c_int,
+    pub min_offset:           cty::c_int,
+    pub max_offset:           cty::c_int,
+    pub total_offsets:        cty::c_longlong,
+    pub min_match_len:        cty::c_int,
+    pub max_match_len:        cty::c_int,
+    pub total_match_lens:     cty::c_int,
+    pub min_rle1_len:         cty::c_int,
+    pub max_rle1_len:         cty::c_int,
+    pub total_rle1_lens:      cty::c_int,
+    pub min_rle2_len:         cty::c_int,
+    pub max_rle2_len:         cty::c_int,
+    pub total_rle2_lens:      cty::c_int,
+    pub commands_divisor:     cty::c_int,
+    pub match_divisor:        cty::c_int,
+    pub rle1_divisor:         cty::c_int,
+    pub rle2_divisor:         cty::c_int,
 }
 
-impl Default for apultra_stats {
-    fn default() -> apultra_stats {
+impl Default for apultra_stats
+{
+    fn default() -> apultra_stats
+    {
         apultra_stats {
-            num_literals: 0,
-            num_4bit_matches: 0,
-            num_7bit_matches: 0,
+            num_literals:         0,
+            num_4bit_matches:     0,
+            num_7bit_matches:     0,
             num_variable_matches: 0,
-            num_rep_matches: 0,
-            num_eod: 0,
-            safe_dist: 0,
-            min_offset: 0,
-            max_offset: 0,
-            total_offsets: 0,
-            min_match_len: 0,
-            max_match_len: 0,
-            total_match_lens: 0,
-            min_rle1_len: 0,
-            max_rle1_len: 0,
-            total_rle1_lens: 0,
-            min_rle2_len: 0,
-            max_rle2_len: 0,
-            total_rle2_lens: 0,
-            commands_divisor: 0,
-            match_divisor: 0,
-            rle1_divisor: 0,
-            rle2_divisor: 0,
+            num_rep_matches:      0,
+            num_eod:              0,
+            safe_dist:            0,
+            min_offset:           0,
+            max_offset:           0,
+            total_offsets:        0,
+            min_match_len:        0,
+            max_match_len:        0,
+            total_match_lens:     0,
+            min_rle1_len:         0,
+            max_rle1_len:         0,
+            total_rle1_lens:      0,
+            min_rle2_len:         0,
+            max_rle2_len:         0,
+            total_rle2_lens:      0,
+            commands_divisor:     0,
+            match_divisor:        0,
+            rle1_divisor:         0,
+            rle2_divisor:         0,
         }
     }
 }
@@ -93,12 +90,14 @@ extern "C" {
 }
 
 #[test]
-fn test_compress() {
+fn test_compress()
+{
     let mut stats = apultra_stats::default();
     let input = b"1234567890";
     let window_size = 32;
     let mut output = vec![0u8; 40];
-    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong) {
+    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+    {
         println!("{} {}", a, b);
     }
 
@@ -121,12 +120,14 @@ fn test_compress() {
 }
 
 #[test]
-fn test_compress_error() {
+fn test_compress_error()
+{
     let mut stats = apultra_stats::default();
     let input = b"1234567890";
     let window_size = 32;
     let mut _output = vec![0u8; 2];
-    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong) {
+    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+    {
         println!("{} {}", a, b);
     }
 
@@ -147,7 +148,8 @@ fn test_compress_error() {
 }
 
 #[test]
-fn test_decompress() {
+fn test_decompress()
+{
     let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
     let window_size = 32;
     let mut output = vec![0u8; 40];
@@ -161,7 +163,8 @@ fn test_decompress() {
 }
 
 #[test]
-fn test_decompress_error() {
+fn test_decompress_error()
+{
     let input = vec![45];
     let window_size = 0;
     let mut _output = vec![0u8; 40];
@@ -173,7 +176,8 @@ fn test_decompress_error() {
 }
 
 #[test]
-fn test_get_max_compressed_size() {
+fn test_get_max_compressed_size()
+{
     unsafe {
         assert_eq!(apultra_get_max_compressed_size(0), 2);
         assert_eq!(apultra_get_max_compressed_size(1), 3);
@@ -183,7 +187,8 @@ fn test_get_max_compressed_size() {
 }
 
 #[test]
-fn test_get_max_decompressed_size() {
+fn test_get_max_decompressed_size()
+{
     let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
     unsafe {
         assert_eq!(apultra_get_max_decompressed_size(input.as_ptr(), input.len(), 0), 10);
