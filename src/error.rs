@@ -11,23 +11,34 @@ pub enum ApultraError
     DecompressionError(),
 }
 
-#[test]
-fn test_compression_error()
+#[cfg(test)]
+mod test
 {
-    let e: Result<bool, ApultraError> = Err(ApultraError::CompressionError());
-    assert!(e.is_err());
+    use super::ApultraError;
+    #[test]
+    fn compression_error()
+    {
+        let e: Result<bool, ApultraError> = Err(ApultraError::CompressionError());
+        assert!(e.is_err());
 
-    let func = || -> Result<bool, ApultraError> { Err(ApultraError::CompressionError())? };
+        let func = || -> Result<bool, ApultraError> { Err(ApultraError::CompressionError())? };
 
-    assert_eq!("Compression error: Internal API returned -1", format!("{}", func().unwrap_err()));
-}
+        assert_eq!(
+            "Compression error: Internal API returned -1",
+            format!("{}", func().unwrap_err())
+        );
+    }
 
-#[test]
-fn test_decompression_error()
-{
-    let e: Result<bool, ApultraError> = Err(ApultraError::DecompressionError());
-    assert!(e.is_err());
-    let func = || -> Result<bool, ApultraError> { Err(ApultraError::DecompressionError())? };
+    #[test]
+    fn decompression_error()
+    {
+        let e: Result<bool, ApultraError> = Err(ApultraError::DecompressionError());
+        assert!(e.is_err());
+        let func = || -> Result<bool, ApultraError> { Err(ApultraError::DecompressionError())? };
 
-    assert_eq!("Decompression error: Internal API returned -1", format!("{}", func().unwrap_err()));
+        assert_eq!(
+            "Decompression error: Internal API returned -1",
+            format!("{}", func().unwrap_err())
+        );
+    }
 }

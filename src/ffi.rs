@@ -89,108 +89,114 @@ extern "C" {
     ) -> cty::size_t;
 }
 
-#[test]
-fn test_compress()
+#[cfg(test)]
+mod test
 {
-    let mut stats = apultra_stats::default();
-    let input = b"1234567890";
-    let window_size = 32;
-    let mut output = vec![0u8; 40];
-    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+    use super::*;
+
+    #[test]
+    fn compress()
     {
-        println!("{} {}", a, b);
+        let mut stats = apultra_stats::default();
+        let input = b"1234567890";
+        let window_size = 32;
+        let mut output = vec![0u8; 40];
+        extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+        {
+            println!("{} {}", a, b);
+        }
+
+        let output_len = unsafe {
+            apultra_compress(
+                &input[0],
+                &output[0],
+                input.len(),
+                output.len(),
+                0,
+                window_size,
+                0,
+                Some(progress),
+                Some(&mut stats),
+            )
+        };
+        assert_eq!(output_len, 13);
+        output.resize(output_len as usize, 0);
+        assert_eq!(output, [49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0]);
     }
 
-    let output_len = unsafe {
-        apultra_compress(
-            &input[0],
-            &output[0],
-            input.len(),
-            output.len(),
-            0,
-            window_size,
-            0,
-            Some(progress),
-            Some(&mut stats),
-        )
-    };
-    assert_eq!(output_len, 13);
-    output.resize(output_len as usize, 0);
-    assert_eq!(output, [49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0]);
-}
-
-#[test]
-fn test_compress_error()
-{
-    let mut stats = apultra_stats::default();
-    let input = b"1234567890";
-    let window_size = 32;
-    let mut _output = vec![0u8; 2];
-    extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+    #[test]
+    fn compress_error()
     {
-        println!("{} {}", a, b);
+        let mut stats = apultra_stats::default();
+        let input = b"1234567890";
+        let window_size = 32;
+        let mut _output = vec![0u8; 2];
+        extern "C" fn progress(a: cty::c_longlong, b: cty::c_longlong)
+        {
+            println!("{} {}", a, b);
+        }
+
+        let output_len = unsafe {
+            apultra_compress(
+                &input[0],
+                &_output[0],
+                input.len(),
+                _output.len(),
+                0,
+                window_size,
+                0,
+                Some(progress),
+                Some(&mut stats),
+            )
+        };
+        assert_eq!(output_len, -1);
     }
 
-    let output_len = unsafe {
-        apultra_compress(
-            &input[0],
-            &_output[0],
-            input.len(),
-            _output.len(),
-            0,
-            window_size,
-            0,
-            Some(progress),
-            Some(&mut stats),
-        )
-    };
-    assert_eq!(output_len, -1);
-}
+    #[test]
+    fn decompress()
+    {
+        let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
+        let window_size = 32;
+        let mut output = vec![0u8; 40];
 
-#[test]
-fn test_decompress()
-{
-    let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
-    let window_size = 32;
-    let mut output = vec![0u8; 40];
-
-    let output_len = unsafe {
-        apultra_decompress(&input[0], &output[0], input.len(), output.len(), 0, window_size)
-    };
-    assert_eq!(output_len, 10);
-    output.resize(output_len as usize, 0);
-    assert_eq!(output, b"1234567890");
-}
-
-#[test]
-fn test_decompress_error()
-{
-    let input = vec![45];
-    let window_size = 0;
-    let mut _output = vec![0u8; 40];
-
-    let output_len = unsafe {
-        apultra_decompress(&input[0], &_output[0], input.len(), _output.len(), 0, window_size)
-    };
-    assert_eq!(output_len, -1);
-}
-
-#[test]
-fn test_get_max_compressed_size()
-{
-    unsafe {
-        assert_eq!(apultra_get_max_compressed_size(0), 2);
-        assert_eq!(apultra_get_max_compressed_size(1), 3);
-        assert_eq!(apultra_get_max_compressed_size(2), 4);
-        assert_eq!(apultra_get_max_compressed_size(3), 5);
+        let output_len = unsafe {
+            apultra_decompress(&input[0], &output[0], input.len(), output.len(), 0, window_size)
+        };
+        assert_eq!(output_len, 10);
+        output.resize(output_len as usize, 0);
+        assert_eq!(output, b"1234567890");
     }
-}
 
-#[test]
-fn test_get_max_decompressed_size()
-{
-    let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
-    unsafe {
-        assert_eq!(apultra_get_max_decompressed_size(input.as_ptr(), input.len(), 0), 10);
+    #[test]
+    fn decompress_error()
+    {
+        let input = vec![45];
+        let window_size = 0;
+        let mut _output = vec![0u8; 40];
+
+        let output_len = unsafe {
+            apultra_decompress(&input[0], &_output[0], input.len(), _output.len(), 0, window_size)
+        };
+        assert_eq!(output_len, -1);
+    }
+
+    #[test]
+    fn get_max_compressed_size()
+    {
+        unsafe {
+            assert_eq!(apultra_get_max_compressed_size(0), 2);
+            assert_eq!(apultra_get_max_compressed_size(1), 3);
+            assert_eq!(apultra_get_max_compressed_size(2), 4);
+            assert_eq!(apultra_get_max_compressed_size(3), 5);
+        }
+    }
+
+    #[test]
+    fn get_max_decompressed_size()
+    {
+        let input = vec![49, 0, 50, 51, 52, 53, 54, 55, 56, 57, 96, 48, 0];
+        unsafe {
+            assert_eq!(apultra_get_max_decompressed_size(input.as_ptr(), input.len(), 0), 10);
+        }
     }
 }

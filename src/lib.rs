@@ -144,61 +144,67 @@ pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize
     unsafe { apultra_get_max_decompressed_size(input_data.as_ptr(), input_data.len(), flags) }
 }
 
-#[test]
-fn test_compress()
+#[cfg(test)]
+mod test
 {
-    let input_data = vec![0; 100];
-    let max_window_size = 0;
-    let dictionary_size = 0;
-    let flags = 0;
-    let progress = |a, b| {
-        println!("{} {}", a, b);
-    };
-    let mut stats = apultra_stats::default();
-    let compressed = compress(
-        &input_data,
-        max_window_size,
-        dictionary_size,
-        flags,
-        Some(Box::new(progress)),
-        Some(&mut stats),
-    )
-    .unwrap();
-    assert_eq!(compressed.len(), 6);
-    assert_eq!(compressed, [0, 173, 1, 86, 192, 0]);
-}
+    use super::*;
 
-#[test]
-fn test_decompress()
-{
-    let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
-    let dictionary_size = 0;
-    let flags = 0;
-    let decompressed = decompress(&input_data, dictionary_size, flags).unwrap();
-    assert_eq!(decompressed.len(), 100);
-    assert_eq!(decompressed, [0; 100]);
-}
+    #[test]
+    fn compress()
+    {
+        let input_data = vec![0; 100];
+        let max_window_size = 0;
+        let dictionary_size = 0;
+        let flags = 0;
+        let progress = |a, b| {
+            println!("{} {}", a, b);
+        };
+        let mut stats = apultra_stats::default();
+        let compressed = super::compress(
+            &input_data,
+            max_window_size,
+            dictionary_size,
+            flags,
+            Some(Box::new(progress)),
+            Some(&mut stats),
+        )
+        .unwrap();
+        assert_eq!(compressed.len(), 6);
+        assert_eq!(compressed, [0, 173, 1, 86, 192, 0]);
+    }
 
-//: Test only works with vec::try_reserve() support.
-/*
-#[test]
-fn test_decompress_error() {
-    let input_data: Vec<u8> = vec![0];
-    let flags = 0;
-    let dictionary_size = 0;
-    let _err = decompress(&input_data, dictionary_size, flags).unwrap_err();
-}
-*/
+    #[test]
+    fn decompress()
+    {
+        let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
+        let dictionary_size = 0;
+        let flags = 0;
+        let decompressed = super::decompress(&input_data, dictionary_size, flags).unwrap();
+        assert_eq!(decompressed.len(), 100);
+        assert_eq!(decompressed, [0; 100]);
+    }
 
-#[test]
-fn test_get_max_compressed_size()
-{
-    assert_eq!(get_max_compressed_size(100), 114);
-}
+    //: Test only works with vec::try_reserve() support.
+    /*
+    #[test]
+    fn decompress_error() {
+        let input_data: Vec<u8> = vec![0];
+        let flags = 0;
+        let dictionary_size = 0;
+        let _err = super::decompress(&input_data, dictionary_size, flags).unwrap_err();
+    }
+    */
 
-#[test]
-fn test_get_max_decompressed_size()
-{
-    let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
-    assert_eq!(get_max_decompressed_size(&input_data, 0), 100);
+    #[test]
+    fn get_max_compressed_size()
+    {
+        assert_eq!(super::get_max_compressed_size(100), 114);
+    }
+
+    #[test]
+    fn get_max_decompressed_size()
+    {
+        let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
+        assert_eq!(super::get_max_decompressed_size(&input_data, 0), 100);
+    }
 }
