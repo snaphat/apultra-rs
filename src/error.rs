@@ -12,7 +12,7 @@ pub enum ApultraError
 }
 
 #[cfg(test)]
-mod test
+mod tests
 {
     use super::ApultraError;
     #[test]

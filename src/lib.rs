@@ -145,7 +145,7 @@ pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize
 }
 
 #[cfg(test)]
-mod test
+mod tests
 {
     use super::*;
 
