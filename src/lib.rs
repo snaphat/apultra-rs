@@ -16,7 +16,8 @@ use crate::ffi::{
 pub type Stats = apultra_stats;
 pub type Error = ApultraError;
 pub use error::ApultraError::{
-    CompressionError, DecompressionError, InputSizeError, ReservationError,
+    CompressionInternalError, CompressionSizeError, DecompressionInternalError,
+    DecompressionSizeError, ReservationError,
 };
 
 ///Compress memory
@@ -43,7 +44,7 @@ pub fn compress(
     // Check size.
     if input_data.len() == 0
     {
-        return Err(InputSizeError());
+        return Err(CompressionSizeError());
     }
 
     let progress = maybe_progress.as_mut().map(|x| ClosureMut2::new(x));
@@ -73,7 +74,7 @@ pub fn compress(
     // Check for errors.
     match size
     {
-        | -1 => Err(CompressionError()),
+        | -1 => Err(CompressionInternalError()),
         | _ =>
         {
             out_buffer.resize(size as usize, 0);
@@ -100,7 +101,7 @@ pub fn decompress(
     // Check size.
     if input_data.len() == 0
     {
-        return Err(InputSizeError());
+        return Err(DecompressionSizeError());
     }
 
     // Try to allocate memory for decompressed data.
@@ -124,7 +125,7 @@ pub fn decompress(
     // Check for errors.
     match size
     {
-        | -1 => Err(DecompressionError()),
+        | -1 => Err(DecompressionInternalError()),
         | _ =>
         {
             out_buffer.resize(size as usize, 0);
@@ -206,7 +207,7 @@ mod tests
         let decompressed = vec![];
         let err = super::compress(&decompressed, 0, 0, 0, None, None).unwrap_err();
 
-        assert_eq!(err.to_string(), "Size error: Input size of zero");
+        assert_eq!(err.to_string(), "Compression error: Input size of zero");
     }
 
     #[test]
@@ -214,7 +215,7 @@ mod tests
     {
         let input_data = vec![];
         let err = super::decompress(&input_data, 0, 0).unwrap_err();
-        assert_eq!(err.to_string(), "Size error: Input size of zero");
+        assert_eq!(err.to_string(), "Decompression error: Input size of zero");
     }
 
     #[test]
