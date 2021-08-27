@@ -1,5 +1,7 @@
 #![feature(try_reserve)] // Only supported in future Rust.
 
+use std::intrinsics::transmute;
+
 use libffi::high::ClosureMut2;
 
 mod error;
@@ -36,13 +38,8 @@ pub fn compress(
     stats: Option<&mut Stats>,
 ) -> Result<Vec<u8>, ApultraError>
 {
-    let progress = match &mut maybe_progress
-    {
-        | Some(progress) => Some(ClosureMut2::new(progress)),
-        | _ => None,
-    };
-
-    let progress_ptr = progress.as_ref().map_or(None, |a| Some(*a.code_ptr()));
+    let progress = maybe_progress.as_mut().map(|x| ClosureMut2::new(x));
+    let progress_ptr = progress.as_ref().map(|x| *x.code_ptr());
 
     // Try to allocate memory for compressed data.
     let max_size = get_max_compressed_size(input_data.len());
@@ -60,7 +57,7 @@ pub fn compress(
             flags,
             max_window_size,
             dictionary_size,
-            progress_ptr,
+            transmute(progress_ptr),
             stats,
         )
     };

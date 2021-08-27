@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 cty="0.2"
-libffi = { version = "1", features = ["system"] }
+libffi = { version = "2", features = ["system"] }
 thiserror= "1"
 
 [build-dependencies]
