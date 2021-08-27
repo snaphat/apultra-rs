@@ -28,7 +28,6 @@ mod tests
         assert_eq!(input_data, decompressed);
         assert_eq!(stats.min_match_len, 8);
         assert_eq!(stats.max_match_len, 9);
-        //assert_eq!(a, 1);
     }
 
     #[test]
@@ -36,7 +35,7 @@ mod tests
     {
         let input_data = vec![2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
-        let max_window_size = 32;
+        let max_window_size = 64;
         let dictionary_size = 0;
         let flags = 0;
         let compressed =
@@ -48,37 +47,42 @@ mod tests
     }
 
     #[test]
-    fn compression_error()
+    fn compress_input_zero_error()
     {
-        let e: Result<bool, apultra::Error> = Err(apultra::CompressionError());
-        assert!(e.is_err());
+        let decompressed = vec![];
 
-        let func = || -> Result<bool, apultra::Error> { Err(apultra::CompressionError())? };
+        let max_window_size = 32;
+        let dictionary_size = 0;
+        let flags = 0;
+        let compressed =
+            apultra::compress(&decompressed, max_window_size, dictionary_size, flags, None, None)
+                .unwrap_err();
 
-        match func()
-        {
-            | Err(e) =>
-            {
-                println!("{}", e);
-            },
-            | Ok(_) => (),
-        }
+        assert_eq!(compressed.to_string(), "Size error: Input size of zero");
     }
 
     #[test]
-    fn decompression_error()
+    fn decompress_input_zero_error()
     {
-        let e: Result<bool, apultra::Error> = Err(apultra::DecompressionError());
-        assert!(e.is_err());
-        let func = || -> Result<bool, apultra::Error> { Err(apultra::DecompressionError())? };
+        let compressed = vec![];
+        let dictionary_size = 0;
+        let flags = 0;
+        let decompressed = apultra::decompress(&compressed, dictionary_size, flags).unwrap_err();
 
-        match func()
-        {
-            | Err(e) =>
-            {
-                println!("{}", e);
-            },
-            | Ok(_) => (),
-        }
+        assert_eq!(decompressed.to_string(), "Size error: Input size of zero");
+    }
+
+    #[test]
+    fn decompress_reservation_error()
+    {
+        let compressed = vec![0];
+        let dictionary_size = 0;
+        let flags = 0;
+        let decompressed = apultra::decompress(&compressed, dictionary_size, flags).unwrap_err();
+
+        assert_eq!(
+            decompressed.to_string(),
+            "Reservation error: memory allocation failed because the memory allocator returned a error"
+        );
     }
 }

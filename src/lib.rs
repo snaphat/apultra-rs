@@ -15,7 +15,9 @@ use crate::ffi::{
 
 pub type Stats = apultra_stats;
 pub type Error = ApultraError;
-pub use error::ApultraError::{CompressionError, DecompressionError, ReservationError};
+pub use error::ApultraError::{
+    CompressionError, DecompressionError, InputSizeError, ReservationError,
+};
 
 ///Compress memory
 ///
@@ -38,12 +40,18 @@ pub fn compress(
     stats: Option<&mut Stats>,
 ) -> Result<Vec<u8>, ApultraError>
 {
+    // Check size.
+    if input_data.len() == 0
+    {
+        return Err(InputSizeError());
+    }
+
     let progress = maybe_progress.as_mut().map(|x| ClosureMut2::new(x));
     let progress_ptr = progress.as_ref().map(|x| *x.code_ptr());
 
     // Try to allocate memory for compressed data.
     let max_size = get_max_compressed_size(input_data.len());
-    let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
+    let mut out_buffer = Vec::new();
     out_buffer.try_reserve(max_size)?;
     out_buffer.resize(max_size, 0);
 
@@ -89,9 +97,15 @@ pub fn decompress(
     flags: u32,
 ) -> Result<Vec<u8>, ApultraError>
 {
+    // Check size.
+    if input_data.len() == 0
+    {
+        return Err(InputSizeError());
+    }
+
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
-    let mut out_buffer: Vec<u8> = Vec::new();
+    let mut out_buffer = Vec::new();
     out_buffer.try_reserve(max_size)?;
     out_buffer.resize(max_size, 0);
 
@@ -128,7 +142,7 @@ pub fn decompress(
 /// maximum compressed size
 pub fn get_max_compressed_size(input_size: usize) -> usize
 {
-    unsafe { apultra_get_max_compressed_size(input_size) }
+    if input_size == 0 { 0 } else { unsafe { apultra_get_max_compressed_size(input_size) } }
 }
 
 /// Get maximum decompressed size of compressed data
@@ -141,7 +155,9 @@ pub fn get_max_compressed_size(input_size: usize) -> usize
 /// maximum decompressed size
 pub fn get_max_decompressed_size(input_data: &[u8], flags: u32) -> usize
 {
-    unsafe { apultra_get_max_decompressed_size(input_data.as_ptr(), input_data.len(), flags) }
+    let len = input_data.len();
+    let ptr = input_data.as_ptr();
+    if len == 0 { 0 } else { unsafe { apultra_get_max_decompressed_size(ptr, len, flags) } }
 }
 
 #[cfg(test)]
@@ -176,7 +192,7 @@ mod tests
     #[test]
     fn decompress()
     {
-        let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
+        let input_data = vec![0, 173, 1, 86, 192, 0];
         let dictionary_size = 0;
         let flags = 0;
         let decompressed = super::decompress(&input_data, dictionary_size, flags).unwrap();
@@ -187,7 +203,7 @@ mod tests
     #[test]
     fn decompress_error()
     {
-        let input_data: Vec<u8> = vec![0];
+        let input_data = vec![0];
         let flags = 0;
         let dictionary_size = 0;
         let err = super::decompress(&input_data, dictionary_size, flags).unwrap_err();
@@ -204,9 +220,22 @@ mod tests
     }
 
     #[test]
+    fn get_max_compressed_size_zero()
+    {
+        assert_eq!(super::get_max_compressed_size(0), 0);
+    }
+
+    #[test]
     fn get_max_decompressed_size()
     {
-        let input_data: Vec<u8> = vec![0, 173, 1, 86, 192, 0];
+        let input_data = vec![0, 173, 1, 86, 192, 0];
         assert_eq!(super::get_max_decompressed_size(&input_data, 0), 100);
+    }
+
+    #[test]
+    fn get_max_decompressed_size_zero()
+    {
+        let input_data = vec![];
+        assert_eq!(super::get_max_decompressed_size(&input_data, 0), 0);
     }
 }
