@@ -54,7 +54,7 @@ mod tests
         let decompressed = vec![];
         let err = apultra::compress(&decompressed, 32, 0, 0, None, None).unwrap_err();
 
-        assert_eq!(err.to_string(), "Compression error: Input size of zero");
+        assert_eq!(err.to_string(), "Compression Error: Input size of zero");
     }
 
     #[test]
@@ -63,7 +63,7 @@ mod tests
         let compressed = vec![];
         let err = apultra::decompress(&compressed, 0, 0).unwrap_err();
 
-        assert_eq!(err.to_string(), "Decompression error: Input size of zero");
+        assert_eq!(err.to_string(), "Decompression Error: Input size of zero");
     }
 
     #[test]
@@ -75,7 +75,7 @@ mod tests
 
         assert_eq!(
             err.to_string(),
-            "Compression error: memory allocation failed because the memory allocator returned a error"
+            "Compression Error: memory allocation failed because the memory allocator returned a error"
         );
     }
 
@@ -87,7 +87,7 @@ mod tests
 
         assert_eq!(
             err.to_string(),
-            "Decompression error: memory allocation failed because the memory allocator returned a error"
+            "Decompression Error: memory allocation failed because the memory allocator returned a error"
         );
     }
 }

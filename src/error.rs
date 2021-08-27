@@ -6,16 +6,16 @@ use thiserror::Error;
 pub enum ApultraError
 {
     // Normal Errors:
-    #[error("Compression error: Internal API returned -1")]
+    #[error("Compression Error: Internal API returned -1")]
     CompressInternalError(),
-    #[error("Decompression error: Internal API returned -1")]
+    #[error("Decompression Error: Internal API returned -1")]
     DecompressInternalError(),
-    #[error("Compression error: Input size of zero")]
+    #[error("Compression Error: Input size of zero")]
     CompressSizeError(),
-    #[error("Decompression error: Input size of zero")]
+    #[error("Decompression Error: Input size of zero")]
     DecompressSizeError(),
-    #[error("Compression error: {0}")]
+    #[error("Compression Error: {0}")]
     CompressReserveError(TryReserveError),
-    #[error("Decompression error: {0}")]
+    #[error("Decompression Error: {0}")]
     DecompressReserveError(TryReserveError),
 }
