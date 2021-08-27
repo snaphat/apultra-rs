@@ -6,7 +6,10 @@ mod error;
 mod ffi;
 use error::ApultraError;
 
-use crate::ffi::*;
+use crate::ffi::{
+    apultra_compress, apultra_decompress, apultra_get_max_compressed_size,
+    apultra_get_max_decompressed_size, apultra_stats,
+};
 
 pub type Stats = apultra_stats;
 pub type Error = ApultraError;
