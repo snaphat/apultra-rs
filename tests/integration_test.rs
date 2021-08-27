@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests
 {
+    use std::intrinsics::transmute;
+
     use apultra;
 
     #[test]
@@ -50,38 +52,41 @@ mod tests
     fn compress_input_zero_error()
     {
         let decompressed = vec![];
+        let err = apultra::compress(&decompressed, 32, 0, 0, None, None).unwrap_err();
 
-        let max_window_size = 32;
-        let dictionary_size = 0;
-        let flags = 0;
-        let compressed =
-            apultra::compress(&decompressed, max_window_size, dictionary_size, flags, None, None)
-                .unwrap_err();
-
-        assert_eq!(compressed.to_string(), "Size error: Input size of zero");
+        assert_eq!(err.to_string(), "Size error: Input size of zero");
     }
 
     #[test]
     fn decompress_input_zero_error()
     {
         let compressed = vec![];
-        let dictionary_size = 0;
-        let flags = 0;
-        let decompressed = apultra::decompress(&compressed, dictionary_size, flags).unwrap_err();
+        let err = apultra::decompress(&compressed, 0, 0).unwrap_err();
 
-        assert_eq!(decompressed.to_string(), "Size error: Input size of zero");
+        assert_eq!(err.to_string(), "Size error: Input size of zero");
+    }
+
+    #[test]
+    fn compress_reservation_error()
+    {
+        let raw = [255, 255, 255, 255]; // 4 bytes of memory.
+        let decompressed: &[u8] = unsafe { transmute(raw) }; // max size fat pointer.
+        let err = apultra::compress(&decompressed, 32, 0, 0, None, None).unwrap_err();
+
+        assert_eq!(
+            err.to_string(),
+            "Reservation error: memory allocation failed because the memory allocator returned a error"
+        );
     }
 
     #[test]
     fn decompress_reservation_error()
     {
         let compressed = vec![0];
-        let dictionary_size = 0;
-        let flags = 0;
-        let decompressed = apultra::decompress(&compressed, dictionary_size, flags).unwrap_err();
+        let err = apultra::decompress(&compressed, 0, 0).unwrap_err();
 
         assert_eq!(
-            decompressed.to_string(),
+            err.to_string(),
             "Reservation error: memory allocation failed because the memory allocator returned a error"
         );
     }

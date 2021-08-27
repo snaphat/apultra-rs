@@ -201,12 +201,40 @@ mod tests
     }
 
     #[test]
-    fn decompress_error()
+    fn compress_input_zero_error()
+    {
+        let decompressed = vec![];
+        let err = super::compress(&decompressed, 0, 0, 0, None, None).unwrap_err();
+
+        assert_eq!(err.to_string(), "Size error: Input size of zero");
+    }
+
+    #[test]
+    fn decompress_input_zero_error()
+    {
+        let input_data = vec![];
+        let err = super::decompress(&input_data, 0, 0).unwrap_err();
+        assert_eq!(err.to_string(), "Size error: Input size of zero");
+    }
+
+    #[test]
+    fn compress_reservation_error()
+    {
+        let raw = [255, 255, 255, 255]; // 4 bytes of memory.
+        let decompressed: &[u8] = unsafe { transmute(raw) }; // max size fat pointer.
+        let err = super::compress(&decompressed, 0, 0, 0, None, None).unwrap_err();
+
+        assert_eq!(
+            err.to_string(),
+            "Reservation error: memory allocation failed because the memory allocator returned a error"
+        );
+    }
+
+    #[test]
+    fn decompress_reservation_error()
     {
         let input_data = vec![0];
-        let flags = 0;
-        let dictionary_size = 0;
-        let err = super::decompress(&input_data, dictionary_size, flags).unwrap_err();
+        let err = super::decompress(&input_data, 0, 0).unwrap_err();
         assert_eq!(
             err.to_string(),
             "Reservation error: memory allocation failed because the memory allocator returned a error"
