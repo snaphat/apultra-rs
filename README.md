@@ -18,7 +18,8 @@ path = "apultra-rs"
 
 Example Usage in main.rs:
 ```rust
-fn main() {
+fn main()
+{
     // Create some data.
     let ddata0 = vec![1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5];
 
@@ -42,11 +43,13 @@ fn main() {
     );
 
     // Check.
-    let cdata0 = match cdata_res {
-        | Err(err) => {
+    let cdata0 = match cdata_res
+    {
+        | Err(err) =>
+        {
             println!("Error: {}", err);
             return;
-        }
+        },
         | Ok(cdata) => cdata,
     };
 
@@ -54,11 +57,13 @@ fn main() {
     let ddata_res = apultra::decompress(&cdata0, dictionary_size, flags);
 
     // Check.
-    let ddata1 = match ddata_res {
-        | Err(err) => {
+    let ddata1 = match ddata_res
+    {
+        | Err(err) =>
+        {
             println!("Error: {}", err);
             return;
-        }
+        },
         | Ok(ddata) => ddata,
     };
 

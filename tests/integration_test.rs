@@ -6,6 +6,60 @@ mod tests
     use apultra;
 
     #[test]
+    fn main()
+    {
+        // Create some data.
+        let ddata0 = vec![1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5];
+
+        // Create other example parameters.
+        let max_window_size = 1024;
+        let dictionary_size = 0;
+        let flags = 0; // Must be zero.
+        let progress = |original_size: i64, compressed_size: i64| {
+            println!("Original size: {}, Compressed Size: {}", original_size, compressed_size);
+        };
+        let mut stats = apultra::Stats::default();
+
+        // Compress data.
+        let cdata_res = apultra::compress(
+            &ddata0,
+            max_window_size,
+            dictionary_size,
+            flags,
+            Some(Box::new(progress)), // Pass callback closure. None can also be passed.
+            Some(&mut stats),         // Pass stats structure. None can also be passed.
+        );
+
+        // Check.
+        let cdata0 = match cdata_res
+        {
+            | Err(err) =>
+            {
+                println!("Error: {}", err);
+                return;
+            },
+            | Ok(cdata) => cdata,
+        };
+
+        // Decompress data.
+        let ddata_res = apultra::decompress(&cdata0, dictionary_size, flags);
+
+        // Check.
+        let ddata1 = match ddata_res
+        {
+            | Err(err) =>
+            {
+                println!("Error: {}", err);
+                return;
+            },
+            | Ok(ddata) => ddata,
+        };
+
+        // Verify result.
+        assert_eq!(ddata0, ddata1);
+    }
+
+    #[test]
     fn compress_decompress()
     {
         let input_data = vec![2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2];
