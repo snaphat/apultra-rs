@@ -1,4 +1,4 @@
-//#![feature(try_reserve)] // Only supported in future Rust.
+#![feature(try_reserve)] // Only supported in future Rust.
 
 use libffi::high::ClosureMut2;
 
@@ -10,7 +10,7 @@ use crate::ffi::*;
 
 pub type Stats = apultra_stats;
 pub type Error = ApultraError;
-pub use error::ApultraError::{CompressionError, DecompressionError};
+pub use error::ApultraError::{CompressionError, DecompressionError, ReservationError};
 
 ///Compress memory
 ///
@@ -44,7 +44,7 @@ pub fn compress(
     // Try to allocate memory for compressed data.
     let max_size = get_max_compressed_size(input_data.len());
     let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
-    //out_buffer.try_reserve(max_size)?; // Only supported in future Rust.
+    out_buffer.try_reserve(max_size)?;
     out_buffer.resize(max_size, 0);
 
     // Compress data.
@@ -91,8 +91,8 @@ pub fn decompress(
 {
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
-    let mut out_buffer: Vec<u8> = Vec::with_capacity(max_size);
-    //out_buffer.try_reserve(max_size)?; // Only supported in future Rust.
+    let mut out_buffer: Vec<u8> = Vec::new();
+    out_buffer.try_reserve(max_size)?;
     out_buffer.resize(max_size, 0);
 
     // Decompress data.
@@ -184,16 +184,18 @@ mod tests
         assert_eq!(decompressed, [0; 100]);
     }
 
-    //: Test only works with vec::try_reserve() support.
-    /*
     #[test]
-    fn decompress_error() {
+    fn decompress_error()
+    {
         let input_data: Vec<u8> = vec![0];
         let flags = 0;
         let dictionary_size = 0;
-        let _err = super::decompress(&input_data, dictionary_size, flags).unwrap_err();
+        let err = super::decompress(&input_data, dictionary_size, flags).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Reservation error: memory allocation failed because the memory allocator returned a error"
+        );
     }
-    */
 
     #[test]
     fn get_max_compressed_size()

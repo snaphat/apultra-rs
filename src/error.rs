@@ -1,5 +1,6 @@
-extern crate thiserror;
-use self::thiserror::Error;
+use std::collections::TryReserveError;
+
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ApultraError
@@ -9,6 +10,9 @@ pub enum ApultraError
     CompressionError(),
     #[error("Decompression error: Internal API returned -1")]
     DecompressionError(),
+    #[error("Reservation error: {source}")]
+    #[rustfmt::skip]
+    ReservationError { #[from] source: TryReserveError, },
 }
 
 #[cfg(test)]

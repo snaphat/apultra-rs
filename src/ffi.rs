@@ -1,4 +1,3 @@
-extern crate cty;
 #[repr(C)]
 pub struct apultra_stats
 {
