@@ -7,14 +7,15 @@ pub enum ApultraError
 {
     // Normal Errors:
     #[error("Compression error: Internal API returned -1")]
-    CompressionInternalError(),
+    CompressInternalError(),
     #[error("Decompression error: Internal API returned -1")]
-    DecompressionInternalError(),
+    DecompressInternalError(),
     #[error("Compression error: Input size of zero")]
-    CompressionSizeError(),
+    CompressSizeError(),
     #[error("Decompression error: Input size of zero")]
-    DecompressionSizeError(),
-    #[error("Reservation error: {source}")]
-    #[rustfmt::skip]
-    ReservationError { #[from] source: TryReserveError, },
+    DecompressSizeError(),
+    #[error("Compression error: {0}")]
+    CompressReserveError(TryReserveError),
+    #[error("Decompression error: {0}")]
+    DecompressReserveError(TryReserveError),
 }

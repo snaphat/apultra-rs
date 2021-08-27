@@ -67,7 +67,7 @@ mod tests
     }
 
     #[test]
-    fn compress_reservation_error()
+    fn compress_reserve_error()
     {
         let raw = [255, 255, 255, 255]; // 4 bytes of memory.
         let decompressed: &[u8] = unsafe { transmute(raw) }; // max size fat pointer.
@@ -75,19 +75,19 @@ mod tests
 
         assert_eq!(
             err.to_string(),
-            "Reservation error: memory allocation failed because the memory allocator returned a error"
+            "Compression error: memory allocation failed because the memory allocator returned a error"
         );
     }
 
     #[test]
-    fn decompress_reservation_error()
+    fn decompress_reserve_error()
     {
         let compressed = vec![0];
         let err = apultra::decompress(&compressed, 0, 0).unwrap_err();
 
         assert_eq!(
             err.to_string(),
-            "Reservation error: memory allocation failed because the memory allocator returned a error"
+            "Decompression error: memory allocation failed because the memory allocator returned a error"
         );
     }
 }

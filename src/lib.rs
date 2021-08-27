@@ -16,8 +16,8 @@ use crate::ffi::{
 pub type Stats = apultra_stats;
 pub type Error = ApultraError;
 pub use error::ApultraError::{
-    CompressionInternalError, CompressionSizeError, DecompressionInternalError,
-    DecompressionSizeError, ReservationError,
+    CompressInternalError, CompressReserveError, CompressSizeError, DecompressInternalError,
+    DecompressReserveError, DecompressSizeError,
 };
 
 ///Compress memory
@@ -44,7 +44,7 @@ pub fn compress(
     // Check size.
     if input_data.len() == 0
     {
-        return Err(CompressionSizeError());
+        return Err(CompressSizeError());
     }
 
     let progress = maybe_progress.as_mut().map(|x| ClosureMut2::new(x));
@@ -53,7 +53,7 @@ pub fn compress(
     // Try to allocate memory for compressed data.
     let max_size = get_max_compressed_size(input_data.len());
     let mut out_buffer = Vec::new();
-    out_buffer.try_reserve(max_size)?;
+    out_buffer.try_reserve(max_size).map_err(|e| CompressReserveError(e))?;
     out_buffer.resize(max_size, 0);
 
     // Compress data.
@@ -74,7 +74,7 @@ pub fn compress(
     // Check for errors.
     match size
     {
-        | -1 => Err(CompressionInternalError()),
+        | -1 => Err(CompressInternalError()),
         | _ =>
         {
             out_buffer.resize(size as usize, 0);
@@ -101,13 +101,13 @@ pub fn decompress(
     // Check size.
     if input_data.len() == 0
     {
-        return Err(DecompressionSizeError());
+        return Err(DecompressSizeError());
     }
 
     // Try to allocate memory for decompressed data.
     let max_size = get_max_decompressed_size(input_data, flags);
     let mut out_buffer = Vec::new();
-    out_buffer.try_reserve(max_size)?;
+    out_buffer.try_reserve(max_size).map_err(|e| DecompressReserveError(e))?;
     out_buffer.resize(max_size, 0);
 
     // Decompress data.
@@ -125,7 +125,7 @@ pub fn decompress(
     // Check for errors.
     match size
     {
-        | -1 => Err(DecompressionInternalError()),
+        | -1 => Err(DecompressInternalError()),
         | _ =>
         {
             out_buffer.resize(size as usize, 0);
@@ -219,7 +219,7 @@ mod tests
     }
 
     #[test]
-    fn compress_reservation_error()
+    fn compress_reserve_error()
     {
         let raw = [255, 255, 255, 255]; // 4 bytes of memory.
         let decompressed: &[u8] = unsafe { transmute(raw) }; // max size fat pointer.
@@ -227,18 +227,18 @@ mod tests
 
         assert_eq!(
             err.to_string(),
-            "Reservation error: memory allocation failed because the memory allocator returned a error"
+            "Compression error: memory allocation failed because the memory allocator returned a error"
         );
     }
 
     #[test]
-    fn decompress_reservation_error()
+    fn decompress_reserve_error()
     {
         let input_data = vec![0];
         let err = super::decompress(&input_data, 0, 0).unwrap_err();
         assert_eq!(
             err.to_string(),
-            "Reservation error: memory allocation failed because the memory allocator returned a error"
+            "Decompression error: memory allocation failed because the memory allocator returned a error"
         );
     }
 
