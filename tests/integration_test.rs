@@ -141,7 +141,7 @@ mod tests
 
         assert_eq!(
             err.to_string(),
-            "Decompression Error: memory allocation failed because the memory allocator returned a error"
+            "Decompression Error: memory allocation failed because the computed capacity exceeded the collection's maximum"
         );
     }
 }
